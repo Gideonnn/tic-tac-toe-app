@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "heybourn.headwind", // Sort Tailwind classes
+    "bradlc.vscode-tailwindcss", // Tailwind IntelliSense
+    "csstools.postcss", // PostCSS extension for Tailwind imports
+    "editorconfig.editorconfig", // EditorConfig
+    "dbaeumer.vscode-eslint", // ESLint
+    "esbenp.prettier-vscode" // Prettier
+  ]
+}
