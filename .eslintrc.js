@@ -35,7 +35,7 @@ module.exports = {
     ],
     'simple-import-sort/exports': 'warn',
 
-    'no-console': 'warn',
+    // 'no-console': 'warn',
     'no-debugger': 'warn',
 
     // Using any is sometimes necessary, especially when exposing function to

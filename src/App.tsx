@@ -1,26 +1,54 @@
 import React from 'react';
 
-import logo from './logo.svg';
+import TicTacToe from '@gideonnn/tic-tac-toe-contracts/artifacts/contracts/TicTacToe.sol/TicTacToe.json';
 
-import './App.css';
+import { createTicTacToeService } from './services';
 
 function App() {
+  if (!process.env.REACT_APP_CONTRACT_ADDRESS) {
+    return <div>Can not find contract address</div>;
+  }
+
+  const ticTacToeService = createTicTacToeService(
+    process.env.REACT_APP_CONTRACT_ADDRESS,
+    TicTacToe.abi,
+    window.ethereum,
+  );
+
+  const handleCreateGame = async () => {
+    try {
+      const result = await ticTacToeService.createGame(0.001);
+      console.log('createGame successful', result);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleGetBoard = async () => {
+    try {
+      const result = await ticTacToeService.getBoard();
+      console.log('getBoard successful', result);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleGetOpenGames = async () => {
+    try {
+      const result = await ticTacToeService.getOpenGames();
+      console.log('getOpenGames successful', result);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  ticTacToeService.requestAccount();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <button onClick={handleCreateGame}>Create game</button>
+      <button onClick={handleGetBoard}>Get board</button>
+      <button onClick={handleGetOpenGames}>Get open games</button>
     </div>
   );
 }
