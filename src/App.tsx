@@ -2,6 +2,7 @@ import React from 'react';
 
 import TicTacToe from '@gideonnn/tic-tac-toe-contracts/artifacts/contracts/TicTacToe.sol/TicTacToe.json';
 
+import { Theme } from './components';
 import { createTicTacToeService } from './services';
 
 function App() {
@@ -45,11 +46,11 @@ function App() {
   ticTacToeService.requestAccount();
 
   return (
-    <div>
+    <Theme theme="light">
       <button onClick={handleCreateGame}>Create game</button>
       <button onClick={handleGetBoard}>Get board</button>
       <button onClick={handleGetOpenGames}>Get open games</button>
-    </div>
+    </Theme>
   );
 }
 
