@@ -1,7 +1,15 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   extends: ['standard-react', 'prettier', 'plugin:@typescript-eslint/eslint-recommended'],
-  plugins: ['react', 'promise', 'import', 'prettier', 'simple-import-sort', '@typescript-eslint'],
+  plugins: [
+    'react',
+    'react-hooks',
+    'promise',
+    'import',
+    'prettier',
+    'simple-import-sort',
+    '@typescript-eslint',
+  ],
   env: {
     browser: true,
   },
@@ -34,6 +42,12 @@ module.exports = {
       },
     ],
     'simple-import-sort/exports': 'warn',
+
+    // Hooks best practices
+    'react-hooks/rules-of-hooks': 'error',
+
+    // Checks useEffect dependencies
+    'react-hooks/exhaustive-deps': 'warn',
 
     // 'no-console': 'warn',
     'no-debugger': 'warn',
