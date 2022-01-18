@@ -1,56 +1,35 @@
 import React from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import TicTacToe from '@gideonnn/tic-tac-toe-contracts/artifacts/contracts/TicTacToe.sol/TicTacToe.json';
+import { ethers } from 'ethers';
 
-import { Theme } from './components';
-import { createTicTacToeService } from './services';
+import { Layout, Theme } from './components';
+import { Play, Settings } from './pages';
+import { Web3Provider } from './services';
 
 function App() {
-  if (!process.env.REACT_APP_CONTRACT_ADDRESS) {
-    return <div>Can not find contract address</div>;
-  }
-
-  const ticTacToeService = createTicTacToeService(
-    process.env.REACT_APP_CONTRACT_ADDRESS,
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(
+    process.env.REACT_APP_CONTRACT_ADDRESS!,
     TicTacToe.abi,
-    window.ethereum,
+    signer,
   );
 
-  const handleCreateGame = async () => {
-    try {
-      const result = await ticTacToeService.createGame(0.001);
-      console.log('createGame successful', result);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleGetBoard = async () => {
-    try {
-      const result = await ticTacToeService.getBoard();
-      console.log('getBoard successful', result);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleGetOpenGames = async () => {
-    try {
-      const result = await ticTacToeService.getOpenGames();
-      console.log('getOpenGames successful', result);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  ticTacToeService.requestAccount();
-
   return (
-    <Theme theme="light">
-      <button onClick={handleCreateGame}>Create game</button>
-      <button onClick={handleGetBoard}>Get board</button>
-      <button onClick={handleGetOpenGames}>Get open games</button>
-    </Theme>
+    <Web3Provider contract={contract}>
+      <Theme theme="light">
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              <Route path="settings" element={<Settings />} />
+              <Route path="play" element={<Play />} />
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </Theme>
+    </Web3Provider>
   );
 }
 
