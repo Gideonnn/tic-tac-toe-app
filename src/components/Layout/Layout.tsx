@@ -3,5 +3,5 @@ export interface LayoutProps {
 }
 
 export const Layout = ({ children }: LayoutProps) => {
-  return <div className="flex justify-items-center">{children}</div>;
+  return <div className="flex justify-center">{children}</div>;
 };

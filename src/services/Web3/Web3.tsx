@@ -2,15 +2,18 @@ import { createContext, useContext } from 'react';
 
 import { ethers } from 'ethers';
 
+import { TicTacToeGame } from '../../types';
+
 /**
  * Web3 Context
  */
 
 export interface Web3ContextType {
-  requestAccount: () => void;
   createGame: (buyIn: number) => Promise<void>;
+  joinGame: (gameId: number, buyIn: number) => Promise<void>;
   getBoard: () => Promise<number[] | null>;
-  getOpenGames: () => Promise<void>;
+  getOpenGames: () => Promise<TicTacToeGame[]>;
+  makeMove: (index: number) => Promise<void>;
 }
 
 export const Web3Context = createContext<Web3ContextType>({} as Web3ContextType);
@@ -25,26 +28,58 @@ export interface Web3ProviderProps {
 }
 
 export const Web3Provider = ({ contract, children }: Web3ProviderProps) => {
-  const requestAccount = () => {
-    return window.ethereum.request({ method: 'eth_requestAccounts' });
+  const createGame = async (buyIn: number) => {
+    const buyInEth = ethers.utils.parseEther(buyIn.toString());
+    const tx = await contract.createGame(buyInEth, { value: buyInEth });
+    const receipt = await tx.wait();
+    return receipt;
   };
 
-  const createGame = (buyIn: number) => {
+  const joinGame = async (gameId: number, buyIn: number) => {
     const buyInEth = ethers.utils.parseEther(buyIn.toString());
-    return contract.createGame(buyInEth, { value: buyInEth });
+    const tx = await contract.joinGame(gameId, { value: buyInEth });
+    const receipt = await tx.wait();
+    return receipt;
   };
 
   const getBoard = async () => {
     const hasActiveGame = await contract.hasActiveGame();
-    return hasActiveGame ? contract.getBoard() : null;
+    if (hasActiveGame) {
+      const board = await contract.getBoard();
+      return board;
+    }
+
+    console.log('no active game');
+    return null;
   };
 
-  const getOpenGames = () => {
-    return contract.getOpenGames();
+  const getOpenGames = async (): Promise<TicTacToeGame[]> => {
+    try {
+      const games = await contract.getOpenGames();
+      return games.map((data: any) => {
+        const game: TicTacToeGame = {
+          id: data.id,
+          board: data.board,
+          player1: data.player1,
+          player2: data.player2,
+          winner: data.winner,
+          turn: data.turn,
+          buyIn: parseFloat(ethers.utils.formatEther(data.buyIn)),
+        };
+        return game;
+      });
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+
+  const makeMove = async (index: number) => {
+    return contract.makeMove(index);
   };
 
   return (
-    <Web3Context.Provider value={{ requestAccount, createGame, getBoard, getOpenGames }}>
+    <Web3Context.Provider value={{ createGame, joinGame, getBoard, getOpenGames, makeMove }}>
       {children}
     </Web3Context.Provider>
   );

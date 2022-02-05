@@ -1,57 +1,74 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
+import { Board, CreatePanel, GameList } from '../../components';
 import { useWeb3 } from '../../services';
+import { TicTacToeGame } from '../../types';
 
 import '../../styles/colors.scss';
 
-// const handleGetBoard = async () => {
-//   try {
-//     const result = await ticTacToeService.getBoard();
-//     console.log('getBoard successful', result);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
-
-// const handleGetOpenGames = async () => {
-//   try {
-//     const result = await ticTacToeService.getOpenGames();
-//     console.log('getOpenGames successful', result);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
-
 export const Play = () => {
-  const { createGame, getBoard } = useWeb3();
+  const { createGame, joinGame, getBoard, getOpenGames, makeMove } = useWeb3();
   const [board, setBoard] = useState<number[] | null>(null);
+  const [gameList, setGameList] = useState<TicTacToeGame[]>([]);
+
+  const loadData = useCallback(async () => {
+    console.log('called loadData');
+
+    getBoard().then(board => {
+      console.log('board: ', board);
+      setBoard(board);
+    });
+    getOpenGames().then(games => {
+      console.log('games: ', games);
+      setGameList(games);
+    });
+  }, [getBoard, getOpenGames]);
 
   useEffect(() => {
-    getBoard().then(result => {
-      setBoard(result);
-    });
-  }, [getBoard]);
+    loadData();
+  }, [loadData]);
 
-  const handleCreateGame = async () => {
+  const handleBoardClick = async (index: number) => {
     try {
-      const result = await createGame(0.001);
+      const result = await makeMove(index);
+      console.log(result);
+    } catch (error: any) {
+      console.log('Make move went wrong!');
+      console.error(error);
+    }
+  };
+
+  const handleCreateGame = async (buyIn: number) => {
+    try {
+      const result = await createGame(buyIn);
       console.log('createGame successful', result);
-    } catch (error) {
+      await loadData();
+    } catch (error: any) {
+      if (error.code == -32603) {
+        console.log('Transaction cancelled by user');
+      } else {
+        console.log('New error code!');
+        console.error(error);
+      }
+    }
+  };
+
+  const handleJoinGame = async (gameId: number, buyIn: number) => {
+    try {
+      await joinGame(gameId, buyIn);
+      await loadData();
+    } catch (error: any) {
+      console.log('Join game went wrong!');
       console.error(error);
     }
   };
 
   return (
-    <div className="prose">
+    <div className="prose text-center md:mt-12">
       <h1>Tic-tac-toe</h1>
-      <button onClick={handleCreateGame}>Create game</button>
-      {board && (
-        <div>
-          {board.map((value, index) => (
-            <div key={index}>{value}</div>
-          ))}
-        </div>
-      )}
+      {board && <Board cells={board} onClick={handleBoardClick} />}
+      {!board && <CreatePanel onCreateGame={handleCreateGame} />}
+      {!board && gameList.length > 0 && <GameList games={gameList} onJoin={handleJoinGame} />}
     </div>
   );
 };
