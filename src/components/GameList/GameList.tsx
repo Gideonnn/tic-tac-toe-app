@@ -1,5 +1,5 @@
 import { TicTacToeGame } from '../../types';
-import { Ethereum } from '..';
+import { Ethereum } from '../Icons';
 
 export interface GameListProps {
   games: TicTacToeGame[];

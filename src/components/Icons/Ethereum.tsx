@@ -1,12 +1,14 @@
 export interface EthereumProps {
   width?: number;
+  className?: string;
   onClick?: () => void;
 }
 
-export const Ethereum = ({ width, onClick }: EthereumProps) => (
+export const Ethereum = ({ width, className, onClick }: EthereumProps) => (
   <svg
     width={width || 24}
     viewBox="0 0 256 417"
+    className={className}
     xmlns="http://www.w3.org/2000/svg"
     preserveAspectRatio="xMidYMid"
     onClick={onClick}

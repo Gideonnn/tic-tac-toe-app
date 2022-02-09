@@ -6,4 +6,5 @@ export interface TicTacToeGame {
   winner: string;
   turn: string;
   buyIn: number;
+  claimed: boolean;
 }
